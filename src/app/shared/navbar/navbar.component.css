@@ -1,0 +1,17 @@
+#bar-logo {
+    width: 40px;
+}
+
+.bar-logo-off {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.bar-logo-on {
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.nav-item {
+    padding: inherit 3rem;
+}
