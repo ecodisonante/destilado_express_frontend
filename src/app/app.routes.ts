@@ -5,12 +5,18 @@ import { CartComponent } from './components/cart/cart.component';
 import { RegisterComponent } from './components/user/register/register.component';
 import { RecoveryComponent } from './components/user/recovery/recovery.component';
 import { PerfilComponent } from './components/user/perfil/perfil.component';
+import { ProductComponent } from './components/product/product.component';
 
 export const routes: Routes = [
     {
         path: 'catalogo',
         title: 'Catálogo',
         component: ProductListComponent,
+    },
+    {
+        path: 'product/:id',
+        title: 'Producto',
+        component: ProductComponent,
     },
     {
         path: 'cart',
