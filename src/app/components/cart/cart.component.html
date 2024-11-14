@@ -1,0 +1,57 @@
+<!--  Carrito compras -->
+<section id="chart" class="d-inline">
+    <div class="container">
+
+        <h3>Mi carrito</h3>
+
+        @if (cart) {
+
+        <table class="table table-borderless align-middle" id="chart-table">
+            <tr *ngFor="let prod of cart?.items; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>
+                    <table class="table table-borderless align-middle">
+                        <tr>
+                            <td width="15%"><img [src]="prod.imagen" class="chart-img"></td>
+                            <td width="85%">{{ prod.nombre }}</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <div class="precio-oferta text-end">
+                        {{ (prod.oferta > 0 ? prod.oferta : prod.precio) | currency:'CLP':'$' }}
+                    </div>
+                    <div class="precio-antes text-end">
+                        {{ (prod.oferta > 0 ? prod.precio : "") | currency:'CLP':'$' }}
+                    </div>
+                </td>
+                <td>
+                    <span class="btn btn-danger bg-danger" (click)="removeFromChart(prod.id)"><i
+                            class="bi bi-trash"></i></span>
+                </td>
+            </tr>
+            <tr class="fs-5">
+                <th colspan="2" class="pe-5 text-end">Total Descuentos</th>
+                <th class="text-end">{{ cart.discount | currency:'CLP':'$' }}</th>
+            </tr>
+            <tr class="fs-4">
+                <th colspan="2" class="pe-5 text-end">TOTAL</th>
+                <th class="text-end">{{ cart.total | currency:'CLP':'$' }}</th>
+            </tr>
+        </table>
+
+        <div class="text-end mt-5">
+            <a (click)="clearChart()" class="mx-3">vaciar carrito</a>
+            <a href="/" class="btn btn-danger px-3 mx-3">Volver</a>
+            <a *ngIf="cart.total > 0" type="submit" class="btn btn-success px-5" (click)="pagar()">Pagar</a>
+
+        </div>
+
+        }
+
+        @else {
+            <h3>Aun no has comprado nada</h3>
+        }
+
+    </div>
+</section>
