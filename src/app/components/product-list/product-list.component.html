@@ -1,0 +1,37 @@
+<section id="catalogo">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div id="items" class="container row text-center">
+
+                    <div class="col-lg-3 col-md-6 my-3" *ngFor="let prod of catalogo">
+                        <div class="card">
+                            <div class="card-body">
+                                <img [src]="prod.imagen" width="100%">
+                                <span>{{prod.nombre}}</span>
+                            </div>
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="precio-antes col-5">
+                                        {{ (prod.oferta != 0 ? prod.precio : "") | currency:'CLP':'$' }}
+                                    </div>
+                                    <div class="precio-oferta col-7">
+                                        {{ (prod.oferta != 0 ? prod.oferta : prod.precio) | currency:'CLP':'$' }}
+                                    </div>
+                                </div>
+                                <button *ngIf="!isAdmin" class="btn btn-primary btn-sm mt-2"
+                                    (click)="addToCart(prod.id)">
+                                    <i class="bi bi-bag mx-2"></i>Comprar
+                                </button>
+                                <button *ngIf="isAdmin" class="btn btn-success btn-sm mt-2"
+                                    [routerLink]="[ '/product', prod.id ]">
+                                    <i class="bi bi-pencil mx-2"></i>Editar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
