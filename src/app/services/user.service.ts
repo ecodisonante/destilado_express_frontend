@@ -105,6 +105,14 @@ export class UserService {
         return result.asObservable();
     }
 
+    findUserByEmail(email: string): Observable<User | undefined> {
+        return this.getUserList().pipe(
+            map((users: User[]) => {
+                let user = users.find(u => u.email == email);
+                return user;
+            })
+        );
+    }
 
     get isAuthenticated() {
         return this.isLoggedIn.asObservable();

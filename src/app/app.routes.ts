@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { LoginComponent } from './components/user/login/login.component';
 import { CartComponent } from './components/cart/cart.component';
+import { RegisterComponent } from './components/user/register/register.component';
 
 export const routes: Routes = [
     {
@@ -23,11 +24,11 @@ export const routes: Routes = [
                 title: 'Ingresar',
                 component: LoginComponent,
             },
-            // {
-            //     path: 'register',
-            //     title: 'Crear Cuenta',
-            //     // component: RegisterComponent,
-            // },
+            {
+                path: 'register',
+                title: 'Crear Cuenta',
+                component: RegisterComponent,
+            },
             // {
             //     path: 'recovery',
             //     title: 'Recuperar Contraseña',
