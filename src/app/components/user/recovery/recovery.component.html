@@ -1,0 +1,28 @@
+<!--  Formulario Recuperar-->
+<section id="form-recuperar">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mx-auto">
+                <h3>Recuperar Contraseña</h3>
+
+                <form [formGroup]="recoveryForm" (ngSubmit)="recovery()">
+
+                    <div class="mb-3 mt-3">
+                        <label for="correo">Correo:</label>
+                        <input type="email" class="form-control" formControlName="correo">
+                        <div
+                            *ngIf="recoveryForm.get('correo')?.touched && recoveryForm.get('correo')?.hasError('required')">
+                            Este campo es obligatorio</div>
+                        <div
+                            *ngIf="recoveryForm.get('correo')?.touched && recoveryForm.get('correo')?.hasError('email')">
+                            Debe ingresar un correo válido</div>
+                    </div>
+
+                    <a type="menu" class="btn btn-danger me-3 my-3" [routerLink]="['']">Volver</a>
+                    <button type="submit" class="btn btn-primary ms-3 my-3">Enviar</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

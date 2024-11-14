@@ -3,6 +3,7 @@ import { ProductListComponent } from './components/product-list/product-list.com
 import { LoginComponent } from './components/user/login/login.component';
 import { CartComponent } from './components/cart/cart.component';
 import { RegisterComponent } from './components/user/register/register.component';
+import { RecoveryComponent } from './components/user/recovery/recovery.component';
 
 export const routes: Routes = [
     {
@@ -29,11 +30,11 @@ export const routes: Routes = [
                 title: 'Crear Cuenta',
                 component: RegisterComponent,
             },
-            // {
-            //     path: 'recovery',
-            //     title: 'Recuperar Contraseña',
-            //     // component: RecoveryComponent,
-            // },
+            {
+                path: 'recovery',
+                title: 'Recuperar Contraseña',
+                component: RecoveryComponent,
+            },
             // {
             //     path: 'perfil',
             //     title: 'Modificar Perfil',
