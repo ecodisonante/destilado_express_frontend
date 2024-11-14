@@ -1,12 +1,18 @@
 import { Routes } from '@angular/router';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { LoginComponent } from './components/user/login/login.component';
+import { CartComponent } from './components/cart/cart.component';
 
 export const routes: Routes = [
     {
         path: 'catalogo',
         title: 'Catálogo',
         component: ProductListComponent,
+    },
+        {
+        path: 'cart',
+        title: 'Carrito',
+        component: CartComponent,
     },
     {
         path: 'user',

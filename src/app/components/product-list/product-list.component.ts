@@ -4,6 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ProductService } from '../../services/product.service';
+import { UserService } from '../../services/user.service';
+import { CartService } from '../../services/cart.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-catalogo',
@@ -21,10 +24,12 @@ export class ProductListComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
+    private userService: UserService,
+    private cartService: CartService,
   ) { }
 
   ngOnInit(): void {
-    // this.userService.isAdminAuth.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
+    this.userService.isAdminAuth.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
 
     this.route.queryParams.subscribe(params => {
       this.loadProductList();
@@ -40,22 +45,22 @@ export class ProductListComponent implements OnInit {
 
 
   addToCart(id: number) {
-    // let prod = this.catalogo.find(x => x.id === id);
-    // this.cartService.addToActiveCart(prod!);
+    let prod = this.catalogo.find(x => x.id === id);
+    this.cartService.addToActiveCart(prod!);
 
-    // Swal.fire({
-    //   icon: "success",
-    //   title: "Producto Agregado",
-    //   showCancelButton: true,
-    //   confirmButtonText: "Ver mi carrito",
-    //   cancelButtonText: "Seguir comprando"
-    // }).then((result) => {
-    //   if (result.isConfirmed) {
-    //     this.router.navigate(['/cart']);
-    //   } else {
-    //     return;
-    //   }
-    // });
+    Swal.fire({
+      icon: "success",
+      title: "Producto Agregado",
+      showCancelButton: true,
+      confirmButtonText: "Ver mi carrito",
+      cancelButtonText: "Seguir comprando"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.router.navigate(['/cart']);
+      } else {
+        return;
+      }
+    });
   }
 
 }

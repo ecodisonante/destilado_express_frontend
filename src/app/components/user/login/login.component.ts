@@ -5,6 +5,8 @@ import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../../services/user.service';
 import { User } from '../../../models/user.model';
 import Swal from 'sweetalert2';
+import { CartService } from '../../../services/cart.service';
+import { Cart } from '../../../models/cart.model';
 
 /**
  * @description
@@ -25,7 +27,7 @@ export class LoginComponent {
     private fb: FormBuilder,
     private userService: UserService,
     private router: Router,
-    // private cartService: CartService
+    private cartService: CartService
   ) { }
 
 
@@ -51,9 +53,9 @@ export class LoginComponent {
             this.userService.logIn(logingUser);
 
             // Crear carrito del usuario
-            // if (!logingUser.isAdmin) {
-            //   this.cartService.setActiveCart(new Cart(logingUser.username, [], 0, 0));
-            // }
+            if (logingUser.rol.id !== 1) {
+              this.cartService.setActiveCart(new Cart(logingUser.email, [], 0, 0));
+            }
 
             Swal.fire({
               icon: "success",
