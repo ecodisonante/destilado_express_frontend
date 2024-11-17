@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, Subject, catchError, map, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
 import { Product } from '../models/product.model';
 
 /**
@@ -11,49 +11,34 @@ import { Product } from '../models/product.model';
 })
 export class ProductService {
 
-  private productosUrl = '/data/product.json'; // Ruta al archivo JSON
+  private productArray: Product[] = [];
 
-  constructor(private http: HttpClient) { }
+  private readonly productosUrl = '/data/product.json'; // Ruta al archivo JSON
 
+  constructor(private readonly http: HttpClient) { this.loadData() }
+
+  loadData() {
+    if (this.productArray.length == 0) {
+      this.http.get<Product[]>(this.productosUrl).subscribe(data => {
+        this.productArray = data;
+      });
+    }
+  }
 
   getProductList(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.productosUrl);
+    return of(this.productArray);
   }
 
   getProduct(id: number): Observable<Product | undefined> {
-    return this.http.get<Product[]>(this.productosUrl).pipe(
-      map((prods: Product[]) => {
-        return prods.find(p => p.id === id);
-      })
-    );
+    let prod = this.productArray.find(p => p.id === id);
+    return of(prod);
   }
 
   updateProduct(prod: Product): Observable<boolean> {
-    const result = new Subject<boolean>();
+    let index = this.productArray.findIndex(x => x.id === prod.id);
+    this.productArray[index] = prod;
 
-    this.getProductList().subscribe({
-      next: (products) => {
-        // actualiza producto
-        let index = products.findIndex(x => x.id === prod.id);
-        products[index] = prod;
-
-        this.http.post(this.productosUrl, products).pipe(
-          map(() => {
-            result.next(true);
-            result.complete();
-          }),
-          catchError((error) => {
-            result.error(false);
-            return of(false);
-          })
-        ).subscribe();
-      },
-      error: (err) => {
-        result.error(false);
-      }
-    });
-
-    return result.asObservable();
+    return of(true);
   }
 
 }
