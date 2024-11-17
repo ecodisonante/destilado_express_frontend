@@ -1,0 +1,22 @@
+[
+    {
+        "nombre": "admin",
+        "email": "admin@test.com",
+        "password": "Secret123",
+        "direccion": "Direccion Test",
+        "rol": {
+            "id": 1,
+            "nombre": "ADMIN"
+        }
+    },
+    {
+        "nombre": "user",
+        "email": "user@test.com",
+        "password": "Secret123",
+        "direccion": "Direccion Test",
+        "rol": {
+            "id": 2,
+            "nombre": "USER"
+        }
+    }
+]

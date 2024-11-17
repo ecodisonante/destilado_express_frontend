@@ -1,0 +1,46 @@
+<!--  Formulario Ingresar -->
+<section id="form-ingresar" class="d-inline">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-4 col-md-6 d-md-inline d-none ms-auto" id="login-img"></div>
+            <div class="col-lg-4 col-md-6 col-sm-9 mx-auto">
+                <h3>Iniciar Sesión</h3>
+                <form [formGroup]="loginForm" (ngSubmit)="login()">
+
+                    <div class="my-4">
+                        <label for="username">Correo:</label>
+                        <input type="text" class="form-control" formControlName="username">
+                        <div *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.hasError('required')">
+                            Este campo es obligatorio</div>
+                    </div>
+
+                    <div class="my-4">
+                        <label for="password">Contraseña:</label>
+                        <input type="password" class="form-control" formControlName="password"
+                            data-val="required">
+                        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')">
+                            Este campo es obligatorio</div>
+                    </div>
+
+                    <a type="menu" class="btn btn-danger me-3 my-3" [routerLink]="['']">Volver</a>
+                    <button type="submit" class="btn btn-primary ms-3 my-3">Ingresar</button>
+
+                </form>
+
+                <div class="user-actions mt-5">
+
+                    <p> No recuerdas como entrar ??
+                        <a type="menu" [routerLink]="['/user/recovery']">
+                            Recupera tu Contraseña</a>
+                    </p>
+                    <p> Primera vez con nosotros ??
+                        <a type="menu" [routerLink]="['/user/register']">
+                            Crea tu cuenta</a>
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,99 @@
+<section id="edit" class="container">
+
+    @if (producto) {
+
+    <form [formGroup]="productForm" (ngSubmit)="edit()">
+        <h1>{{ title }}</h1>
+        <div class="row">
+            <div class="col-sm-9 col-md-6 col-xl-3 mx-auto ">
+                <div class="card mt-4">
+                    <img [src]="producto.imagen" width="90%" id="img">
+                </div>
+            </div>
+            <div class="col-sm-9 col-md-10 col-xl-9 mx-auto">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3 mt-3">
+                            <label for="id">ID</label>
+                            <input type="number" class="form-control" formControlName="id" readonly>
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" class="form-control" formControlName="nombre">
+                            <div
+                                *ngIf="productForm.get('nombre')?.touched && productForm.get('nombre')?.hasError('required')">
+                                Este campo es obligatorio
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label for="descripcion">Marca</label>
+                            <input type="text" class="form-control" formControlName="descripcion">
+                            <div
+                                *ngIf="productForm.get('descripcion')?.touched && productForm.get('descripcion')?.hasError('required')">
+                                Este campo es obligatorio
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3 mt-3">
+                            <label for="precio">Precio Normal</label>
+                            <input type="number" class="form-control" formControlName="precio">
+                            <div
+                                *ngIf="productForm.get('precio')?.touched && productForm.get('precio')?.hasError('required')">
+                                Este campo es obligatorio
+                            </div>
+                            <div *ngIf="productForm.get('precio')?.touched && productForm.get('precio')?.hasError('min')">
+                                Debes ingresar un valor positivo
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label for="stock">Stock</label>
+                            <input type="number" class="form-control" formControlName="stock">
+                            <div
+                                *ngIf="productForm.get('stock')?.touched && productForm.get('stock')?.hasError('required')">
+                                Este campo es obligatorio
+                            </div>
+                            <div *ngIf="productForm.get('stock')?.touched && productForm.get('stock')?.hasError('min')">
+                                Debes ingresar un valor positivo
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label for="oferta">Precio Oferta</label>
+                            <input type="number" class="form-control" formControlName="oferta">
+                            <div
+                                *ngIf="productForm.get('oferta')?.touched && productForm.get('oferta')?.hasError('required')">
+                                Este campo es obligatorio
+                            </div>
+                            <div
+                                *ngIf="productForm.get('oferta')?.touched && productForm.get('oferta')?.hasError('min')">
+                                Debes ingresar un valor positivo
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="available" name="available"
+                                    [(checked)]="producto!.disponible">
+                                <label class="form-check-label" for="available">
+                                    Disponible
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <a type="menu" class="btn btn-danger me-3 my-3" [routerLink]="['']">Cancelar</a>
+                    <button type="submit" class="btn btn-primary ms-3 my-3">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    }
+    @else {
+
+    <h3>Cargando producto</h3>
+
+    }
+
+</section>

@@ -1,0 +1,42 @@
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" [routerLink]="['catalogo']" [queryParams]="{sale: true}">
+            <img src="/images/logo.png" alt="Avatar Logo" id="bar-logo" [class]="logoClass">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navBar">
+            <ul class="navbar-nav w-100">
+                <li class="nav-item mx-2">
+                    <a class="nav-link" [routerLink]="['catalogo']" id="home">
+                        <i class="bi bi-house mx-2"></i>Inicio</a>
+                </li>
+                <li *ngIf="isAuthenticated && ! isAdmin" class="nav-item mx-2">
+                    <a class="nav-link" [routerLink]="['/cart']">
+                        <i class="bi bi-cart-dash mx-2"></i>Mi Carrito</a>
+                </li>
+                <li *ngIf="!isAuthenticated" class="nav-item mx-2">
+                    <a class="nav-link" [routerLink]="['/user/login']">
+                        <i class="bi bi-arrow-right mx-2"></i>Ingresar</a>
+                </li>
+                <li *ngIf="!isAuthenticated || isAdmin" class="nav-item mx-2">
+                    <a class="nav-link" [routerLink]="['/user/register']">
+                        <i class="bi bi-plus-lg mx-2"></i>Crear Cuenta</a>
+                </li>
+                <li *ngIf="!isAuthenticated" class="nav-item mx-2">
+                    <a class="nav-link" [routerLink]="['/user/recovery']">
+                        <i class="bi bi-question mx-2"></i>Recuperar Contraseña</a>
+                </li>
+                <li *ngIf="isAuthenticated" class="nav-item mx-2">
+                    <a class="nav-link" [routerLink]="['/user/perfil']">
+                        <i class="bi bi-person mx-2"></i>Actualizar Perfil</a>
+                </li>
+                <li *ngIf="isAuthenticated" class="nav-item mx-2">
+                    <a class="nav-link" (click)="salir()">
+                        <i class="bi bi-arrow-left mx-2"></i>Salir</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,67 @@
+<!--  Formulario Registrar-->
+<section id="form-registrar">
+    <form [formGroup]="updateForm" (ngSubmit)="update()">
+        <div class="container">
+            <div class="row">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 ms-auto">
+                        <h3>Actualizar Perfil</h3>
+                    </div>
+                    <div class="col-lg-4 col-md-6 me-auto"></div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 ms-auto">
+
+
+                    <div class="mb-3 mt-3">
+                        <label for="usuario">Nombre de Usuario:</label>
+                        <input type="text" class="form-control" [placeholder]="currentUser.email" disabled>
+                    </div>
+
+                    <div class="mb-3 mt-3">
+                        <label for="nombres">Nombre:</label>
+                        <input type="text" class="form-control" formControlName="nombres">
+                        <div class="text-danger"
+                            *ngIf="updateForm.get('nombres')?.touched && updateForm.get('nombres')?.hasError('required')">
+                            Este campo es obligatorio</div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 me-auto">
+                    <div class="mb-3 mt-3">
+                        <label for="direccion">Dirección:</label>
+                        <input type="text" class="form-control" formControlName="direccion">
+                        <div class="text-danger"
+                            *ngIf="updateForm.get('direccion')?.touched && updateForm.get('direccion')?.hasError('required')">
+                            Este campo es obligatorio</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="passwd">Contraseña:</label>
+                        <input type="password" class="form-control" formControlName="passwd">
+                        <div class="text-danger"
+                            *ngIf="updateForm.get('passwd')?.touched && updateForm.get('passwd')?.hasError('required')">
+                            Este campo es obligatorio</div>
+                        <div class="text-danger"
+                            *ngIf="updateForm.get('passwd')?.touched && updateForm.get('passwd')?.hasError('passwordStrength')">
+                            {{ updateForm.get('passwd')?.getError('passwordStrength') }}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="repasswd">Repetir Contraseña:</label>
+                        <input type="password" class="form-control" formControlName="repasswd">
+                        <div class="text-danger"
+                            *ngIf="updateForm.get('repasswd')?.touched && updateForm.get('repasswd')?.hasError('required')">
+                            Este campo es obligatorio</div>
+                        <div class="text-danger"
+                            *ngIf="updateForm.get('repasswd')?.touched && updateForm.get('repasswd')?.hasError('passwordMatch')">
+                            Las contraseñas no coinciden</div>
+                    </div>
+
+                    <a type="menu" class="btn btn-danger me-3 my-3" [routerLink]="['']">Volver</a>
+                    <button type="submit" class="btn btn-primary ms-3 my-3">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
