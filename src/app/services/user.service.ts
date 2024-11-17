@@ -12,19 +12,31 @@ import { StorageService } from './storage.service';
 })
 export class UserService {
 
-    private userKey = 'authUser';
-    private isLoggedIn = new BehaviorSubject<boolean>(this.checkAuthenticated());
-    private isAdmin = new BehaviorSubject<boolean>(this.checkAdmin());
+    private userArray: User[] = [];
 
-    private userUrl: string = 'data/user.json';
+    private readonly userUrl: string = 'data/user.json';
+    private readonly userKey = 'authUser';
+
+    private readonly isLoggedIn = new BehaviorSubject<boolean>(this.checkAuthenticated());
+    private readonly isAdmin = new BehaviorSubject<boolean>(this.checkAdmin());
 
     constructor(
-        private http: HttpClient,
-        private storage: StorageService
-    ) { }
+        private readonly http: HttpClient,
+        private readonly storage: StorageService
+    ) {
+        this.loadData();
+    }
+
+    loadData() {
+        if (this.userArray.length == 0) {
+            this.http.get<User[]>(this.userUrl).subscribe(data => {
+                this.userArray = data;
+            });
+        }
+    }
 
     getUserList(): Observable<User[]> {
-        return this.http.get<User[]>(this.userUrl);
+        return of(this.userArray);
     }
 
     logIn(user: User): boolean {
@@ -38,71 +50,22 @@ export class UserService {
     }
 
     findUser(email: string, password: string): Observable<User | undefined> {
-        return this.getUserList().pipe(
-            map((users: User[]) => {
-                let user = users.find(u => u.email === email && u.password === password);
-                if (user) user.password = "";
-                return user;
-            })
-        );
+        let user = this.userArray.find(u => u.email === email && u.password === password);
+        return of(user);
     }
 
     addUser(user: User): Observable<boolean> {
-        const result = new Subject<boolean>();
-
-        this.getUserList().subscribe({
-            next: (users) => {
-                // Agrega a lista existente
-                users.push(user);
-                this.http.post(this.userUrl, users).pipe(
-                    map(() => {
-                        // Emitir resultado de post
-                        result.next(true);
-                        result.complete();
-                    }),
-                    catchError((error) => {
-                        result.error(false);
-                        return of(false);
-                    })
-                ).subscribe();
-            },
-            error: (err) => {
-                result.error(false);
-            }
-        });
-
-        return result.asObservable();
+        this.userArray.push(user);
+        return of(true);
     }
 
     updateUser(updatedUser: User): Observable<boolean> {
-        const result = new Subject<boolean>();
-
-        this.getUserList().subscribe({
-            next: (users) => {
-
-                // actualiza usuario
-                let index = users.findIndex(x => x.email === updatedUser.email);
-                users[index] = updatedUser;
-
-                this.http.post(this.userUrl, users).pipe(
-                    map(() => {
-                        // Emitir resultado de post
-                        result.next(true);
-                        result.complete();
-                    }),
-                    catchError((error) => {
-                        result.error(false);
-                        return of(false);
-                    })
-                ).subscribe();
-            },
-            error: (err) => {
-                result.error(false);
-            }
-        });
-
+        let index = this.userArray.findIndex(x => x.email === updatedUser.email);
+        this.userArray[index] = updatedUser;
+        //actualizar datos en memoria
         this.logIn(updatedUser);
-        return result.asObservable();
+
+        return of(true);
     }
 
     findUserByEmail(email: string): Observable<User | undefined> {
