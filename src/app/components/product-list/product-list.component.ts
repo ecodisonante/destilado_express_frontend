@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Product } from '../../models/product.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { UserService } from '../../services/user.service';
 import { CartService } from '../../services/cart.service';
@@ -21,22 +20,19 @@ export class ProductListComponent implements OnInit {
   isAdmin!: boolean;
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private productService: ProductService,
-    private userService: UserService,
-    private cartService: CartService,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly productService: ProductService,
+    private readonly userService: UserService,
+    private readonly cartService: CartService,
   ) { }
 
   ngOnInit(): void {
     this.userService.isAdminAuth.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
-
-    this.route.queryParams.subscribe(params => {
-      this.loadProductList();
-    });
+    this.loadProductList();
   }
 
-  loadProductList(sale?: boolean, category?: number) {
+  loadProductList() {
     this.productService.getProductList().subscribe({
       next: (cat) => this.catalogo = cat,
       error: (error) => console.log(error)
