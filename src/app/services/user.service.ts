@@ -36,10 +36,12 @@ export class UserService {
     }
 
     getUserList(): Observable<User[]> {
+        this.loadData();
         return of(this.userArray);
     }
 
     logIn(user: User): boolean {
+        this.loadData();
         this.storage.setItem(this.userKey, JSON.stringify(user));
 
         // recargar restricciones
@@ -55,6 +57,7 @@ export class UserService {
     }
 
     addUser(user: User): Observable<boolean> {
+        this.loadData();
         this.userArray.push(user);
         return of(true);
     }
@@ -69,6 +72,7 @@ export class UserService {
     }
 
     findUserByEmail(email: string): Observable<User | undefined> {
+        this.loadData();
         return this.getUserList().pipe(
             map((users: User[]) => {
                 let user = users.find(u => u.email == email);
