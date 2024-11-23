@@ -12,9 +12,11 @@ import { Product } from '../models/product.model';
 export class ProductService {
 
   private readonly productArray = new BehaviorSubject<Product[]>([]);
-  private readonly productosUrl = '/data/product.json'; // Ruta al archivo JSON
+  private readonly productosUrl = 'http://localhost:8081/api/productos';
 
-  constructor(private readonly http: HttpClient) { this.loadData() }
+  constructor(private readonly http: HttpClient) {
+    // this.loadData()
+  }
 
   loadData() {
     if (this.productArray.getValue().length == 0) {
@@ -25,8 +27,8 @@ export class ProductService {
   }
 
   getProductList(): Observable<Product[]> {
-    this.loadData();
-    return this.productArray.asObservable();
+    // this.loadData();
+    return this.http.get<Product[]>(this.productosUrl);
   }
 
   getProduct(id: number): Observable<Product | undefined> {
