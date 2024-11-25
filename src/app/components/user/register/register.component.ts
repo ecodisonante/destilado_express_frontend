@@ -7,6 +7,7 @@ import { UserService } from '../../../services/user.service';
 import { Rol, User } from '../../../models/user.model';
 import Swal from 'sweetalert2';
 import { error } from 'console';
+import { AuthService } from '../../../services/auth.service';
 
 /**
  * Componente para manejar el registro de nuevos usuarios.
@@ -38,6 +39,7 @@ export class RegisterComponent {
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
+    private authService: AuthService,
     private router: Router
   ) { }
 
@@ -45,7 +47,7 @@ export class RegisterComponent {
    * metodo inicial de la clase
    */
   ngOnInit(): void {
-    this.userService.isAdminAuth.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
+    this.authService.isAdmin.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
 
     this.registerForm = this.fb.group({
       nombre: ['', Validators.required],

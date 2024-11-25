@@ -6,6 +6,7 @@ import { Product } from '../../models/product.model';
 import { UserService } from '../../services/user.service';
 import { ProductService } from '../../services/product.service';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../services/auth.service';
 
 /**
  * @description
@@ -29,9 +30,10 @@ export class ProductComponent {
         private route: ActivatedRoute,
         private router: Router,
         private userService: UserService,
+        private authService: AuthService,
         private productService: ProductService
     ) {
-        if (!this.userService.checkAdmin()) this.router.navigate(['/']);
+        if (!this.authService.checkAdmin()) this.router.navigate(['/']);
 
         this.productForm = this.fb.group({
             id: [0],

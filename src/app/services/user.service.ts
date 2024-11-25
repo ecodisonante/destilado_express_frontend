@@ -3,6 +3,10 @@ import { BehaviorSubject, Observable, Subject, catchError, map, of } from 'rxjs'
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../models/user.model';
 import { StorageService } from './storage.service';
+import { jwtDecode } from "jwt-decode";
+import { json } from 'stream/consumers';
+import { stringify } from 'querystring';
+import { AuthService } from './auth.service';
 
 /**
  * Clase de servicios relacionados a Usuarios
@@ -15,16 +19,17 @@ export class UserService {
     private userArray: User[] = [];
 
     private readonly userUrl: string = 'data/user.json';
-    private readonly userKey = 'authUser';
+    private readonly tokenKey = 'userToken';
 
-    private readonly isLoggedIn = new BehaviorSubject<boolean>(this.checkAuthenticated());
-    private readonly isAdmin = new BehaviorSubject<boolean>(this.checkAdmin());
+    private readonly apiBaseUrl = 'http://localhost:8080/api/';
+
 
     constructor(
         private readonly http: HttpClient,
-        private readonly storage: StorageService
+        private readonly storageService: StorageService,
+        private readonly authService: AuthService
     ) {
-        this.loadData();
+        // this.loadData();
     }
 
     loadData() {
@@ -38,17 +43,6 @@ export class UserService {
     getUserList(): Observable<User[]> {
         this.loadData();
         return of(this.userArray);
-    }
-
-    logIn(user: User): boolean {
-        this.loadData();
-        this.storage.setItem(this.userKey, JSON.stringify(user));
-
-        // recargar restricciones
-        this.isLoggedIn.next(this.checkAuthenticated());
-        this.isAdmin.next(this.checkAdmin());
-
-        return true
     }
 
     findUser(email: string, password: string): Observable<User | undefined> {
@@ -66,7 +60,7 @@ export class UserService {
         let index = this.userArray.findIndex(x => x.email === updatedUser.email);
         this.userArray[index] = updatedUser;
         //actualizar datos en memoria
-        this.logIn(updatedUser);
+        // this.logIn(updatedUser);
 
         return of(true);
     }
@@ -81,31 +75,8 @@ export class UserService {
         );
     }
 
-    get isAuthenticated() {
-        return this.isLoggedIn.asObservable();
-    }
-
-    get isAdminAuth() {
-        return this.isAdmin.asObservable();
-    }
-
     getActiveUser(): User | null {
-        let user = this.storage.getItem(this.userKey);
+        let user = this.storageService.getItem(this.tokenKey);
         return user ? JSON.parse(user) : null;
     }
-
-    logOut(): void {
-        this.storage.removeItem(this.userKey);
-        this.isLoggedIn.next(this.checkAuthenticated());
-        this.isAdmin.next(this.checkAdmin());
-    }
-
-    checkAuthenticated(): boolean {
-        return this.getActiveUser() !== null;
-    }
-
-    checkAdmin(): boolean {
-        return this.getActiveUser() !== null && this.getActiveUser()!.rol.id === 1;
-    }
-
 }
