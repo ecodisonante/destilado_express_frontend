@@ -1,11 +1,11 @@
-import { CommonModule, formatCurrency } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { User } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { Cart } from '../../models/cart.model';
 import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 
 /**
  * @description
@@ -20,26 +20,33 @@ import { CartService } from '../../services/cart.service';
 })
 export class CartComponent {
 
+  isAuthenticated: boolean = false;
+  isAdmin: boolean = false;
+
   cart!: Cart;
-  user?: User;
+  email?: string;
 
   constructor(
-    private router: Router,
-    private userService: UserService,
-    private cartService: CartService
+    private readonly router: Router,
+    private readonly userService: UserService,
+    private readonly cartService: CartService,
+    private readonly authService: AuthService
   ) { }
 
   ngOnInit(): void {
-    this.user = this.userService.getActiveUser() ?? undefined;
-    if (!this.user) this.router.navigate(['/user/login']);
-    if (this.user?.rol.id === 1) this.router.navigate(['/']);
+    this.authService.isAuthenticated.subscribe((authStatus: boolean) => { this.isAuthenticated = authStatus; });
+    this.authService.isAdmin.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
 
+    if (!this.isAuthenticated) this.router.navigate(['/user/login']);
+    if (this.isAdmin) this.router.navigate(['/']);
+
+    this.email = this.authService.getTokenEmail();
     this.getActiveCart();
   }
 
   getActiveCart() {
-    if (this.user) {
-      this.cart = this.cartService.getActiveCart() ?? new Cart(this.user.email, [], 0, 0);
+    if (this.email) {
+      this.cart = this.cartService.getActiveCart() ?? new Cart(this.email, [], 0, 0);
     }
   }
 
@@ -49,7 +56,7 @@ export class CartComponent {
   }
 
   clearChart() {
-    this.cart = new Cart(this.user!.email, [], 0, 0);
+    this.cart = new Cart(this.email!, [], 0, 0);
     this.cartService.setActiveCart(this.cart);
   }
 
