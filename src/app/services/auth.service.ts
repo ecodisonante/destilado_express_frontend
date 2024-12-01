@@ -87,6 +87,24 @@ export class AuthService {
         return role == 1;
     }
 
+    getTokenId(): string | undefined {
+        let token = this.storageService.getItem(this.tokenKey);
+        const decodedToken = this.decodeToken(token!);
+        return decodedToken?.id || undefined;
+    }
+
+    getTokenName(): string | undefined {
+        let token = this.storageService.getItem(this.tokenKey);
+        const decodedToken = this.decodeToken(token!);
+        return decodedToken?.name || undefined;
+    }
+
+    getTokenEmail(): string | undefined {
+        let token = this.storageService.getItem(this.tokenKey);
+        const decodedToken = this.decodeToken(token!);
+        return decodedToken?.sub || undefined;
+    }
+
     get isAuthenticated() {
         return this.loggedInBehaviour.asObservable();
     }
