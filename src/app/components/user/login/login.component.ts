@@ -50,6 +50,7 @@ export class LoginComponent {
 
           if (this.authService.isValidToken(token)) {
             this.authService.logIn(token);
+            let nombre = this.authService.getTokenName() ?? login.username;
 
             // Crear carrito del usuario
             if (this.authService.checkAdmin()) {
@@ -58,7 +59,7 @@ export class LoginComponent {
 
             Swal.fire({
               icon: "success",
-              title: "Bienvenido, " + token,
+              title: "Bienvenido, " + nombre,
             }).then(() => {
               this.router.navigate(['/']);
             });
