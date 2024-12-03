@@ -53,7 +53,7 @@ export class LoginComponent {
             let nombre = this.authService.getTokenName() ?? login.username;
 
             // Crear carrito del usuario
-            if (this.authService.checkAdmin()) {
+            if (!this.authService.checkAdmin()) {
               this.cartService.setActiveCart(new Cart(login.username, [], 0, 0));
             }
 
