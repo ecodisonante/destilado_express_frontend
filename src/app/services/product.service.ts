@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Product } from '../models/product.model';
+import { AuthService } from './auth.service';
 
 /**
  * Clase de servicios relacionados a Producto
@@ -11,45 +12,50 @@ import { Product } from '../models/product.model';
 })
 export class ProductService {
 
-  private readonly productArray = new BehaviorSubject<Product[]>([]);
+  // private readonly productArray = new BehaviorSubject<Product[]>([]);
   private readonly productosUrl = 'http://localhost:8081/api/productos';
 
-  constructor(private readonly http: HttpClient) {
-    // this.loadData()
-  }
+  constructor(
+    private readonly http: HttpClient,
+    private readonly authService: AuthService
+  ) { }
 
-  loadData() {
-    if (this.productArray.getValue().length == 0) {
-      this.http.get<Product[]>(this.productosUrl).subscribe(
-        data => this.productArray.next(data)
-      );
+  /**
+   * Construye los headers con el token de autenticación.
+   * @returns HttpHeaders con el token incluido.
+   */
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    if (!token) {
+      throw new Error('No se encontró un token válido');
     }
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
   getProductList(): Observable<Product[]> {
-    // this.loadData();
     return this.http.get<Product[]>(this.productosUrl);
   }
 
-  getProduct(id: number): Observable<Product | undefined> {
-    let prod = this.productArray.getValue().find(p => p.id === id);
-    return of(prod);
+  getProductById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.productosUrl}/${id}`, {
+      headers: this.getAuthHeaders()
+    });
   }
 
-  updateProduct(prod: Product): Observable<boolean> {
-    this.loadData();
-
-    const currentArray = this.productArray.getValue();
-    let index = currentArray.findIndex(x => x.id === prod.id);
-
-    // Si el producto existe, actualizar
-    if (index !== -1) {
-      currentArray[index] = prod;
-      this.productArray.next([...currentArray]);
-      return of(true);
-    }
-
-    return of(false);
+  createProduct(product: Product): Observable<Product> {
+    return this.http.post<Product>(this.productosUrl, product);
   }
 
+  updateProduct(id: number, product: Product): Observable<string> {
+    return this.http.put<string>(`${this.productosUrl}/${id}`, product, {
+      headers: this.getAuthHeaders(),
+      responseType: 'text' as 'json'
+    });
+  }
+
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.productosUrl}/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
 }
