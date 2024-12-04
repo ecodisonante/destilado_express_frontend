@@ -25,7 +25,7 @@ export class ProductListComponent implements OnInit {
     private readonly router: Router,
     private readonly productService: ProductService,
     private readonly userService: UserService,
-    private authService: AuthService,
+    private readonly authService: AuthService,
     private readonly cartService: CartService,
   ) { }
 
