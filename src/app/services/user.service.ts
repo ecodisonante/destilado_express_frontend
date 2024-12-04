@@ -1,82 +1,97 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, catchError, map, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../models/user.model';
-import { StorageService } from './storage.service';
-import { jwtDecode } from "jwt-decode";
-import { json } from 'stream/consumers';
-import { stringify } from 'querystring';
 import { AuthService } from './auth.service';
 
-/**
- * Clase de servicios relacionados a Usuarios
- */
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class UserService {
+  private readonly usuariosUrl = 'http://localhost:8080/api/usuarios';
 
-    private userArray: User[] = [];
+  constructor(
+    private readonly http: HttpClient,
+    private readonly authService: AuthService // Clase que maneja los tokens
+  ) { }
 
-    private readonly userUrl: string = 'data/user.json';
-    private readonly tokenKey = 'userToken';
-
-    private readonly apiBaseUrl = 'http://localhost:8080/api/';
-
-
-    constructor(
-        private readonly http: HttpClient,
-        private readonly storageService: StorageService,
-        private readonly authService: AuthService
-    ) {
-        // this.loadData();
+  /**
+   * Construye los headers con el token de autenticación.
+   * @returns HttpHeaders con el token incluido.
+   */
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    if (!token) {
+      throw new Error('No se encontró un token válido');
     }
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  }
 
-    loadData() {
-        if (this.userArray.length == 0) {
-            this.http.get<User[]>(this.userUrl).subscribe(data => {
-                this.userArray = data;
-            });
-        }
-    }
+  /**
+   * Obtener la lista de usuarios.
+   * @returns Observable con la lista de usuarios.
+   */
+  getUserList(): Observable<User[]> {
+    return this.http.get<User[]>(this.usuariosUrl, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-    getUserList(): Observable<User[]> {
-        this.loadData();
-        return of(this.userArray);
-    }
+  /**
+   * Obtener un usuario por su ID.
+   * @param id ID del usuario a buscar.
+   * @returns Observable con el usuario encontrado.
+   */
+  getUserById(id: number): Observable<User> {
+    console.log(`Calling: "${this.usuariosUrl}/${id}"`);
+    return this.http.get<User>(`${this.usuariosUrl}/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-    findUser(email: string, password: string): Observable<User | undefined> {
-        let user = this.userArray.find(u => u.email === email && u.password === password);
-        return of(user);
-    }
+  /**
+   * Obtener un usuario por su email.
+   * @param email Email del usuario a buscar.
+   * @returns Observable con el usuario encontrado.
+   */
+  findUserByEmail(email: string): Observable<User> {
+    return this.http.get<User>(`${this.usuariosUrl}/email?email=${email}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-    addUser(user: User): Observable<boolean> {
-        this.loadData();
-        this.userArray.push(user);
-        return of(true);
-    }
+  /**
+   * Crear un nuevo usuario.
+   * @param user Usuario a crear.
+   * @returns Observable con el usuario creado.
+   */
+  createUser(user: User): Observable<User> {
+    return this.http.post<User>(this.usuariosUrl, user, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-    updateUser(updatedUser: User): Observable<boolean> {
-        let index = this.userArray.findIndex(x => x.email === updatedUser.email);
-        this.userArray[index] = updatedUser;
-        //actualizar datos en memoria
-        // this.logIn(updatedUser);
+  /**
+   * Actualizar un usuario.
+   * @param id ID del usuario a actualizar.
+   * @param user Datos actualizados del usuario.
+   * @returns Observable con una respuesta de éxito.
+   */
+  updateUser(id: number, user: User): Observable<string> {
+    return this.http.put<string>(`${this.usuariosUrl}/${id}`, user, {
+      headers: this.getAuthHeaders(),
+      responseType: 'text' as 'json'
+    });
+  }
 
-        return of(true);
-    }
-
-    findUserByEmail(email: string): Observable<User | undefined> {
-        this.loadData();
-        return this.getUserList().pipe(
-            map((users: User[]) => {
-                let user = users.find(u => u.email == email);
-                return user;
-            })
-        );
-    }
-
-    getActiveUser(): User | null {
-        let user = this.storageService.getItem(this.tokenKey);
-        return user ? JSON.parse(user) : null;
-    }
+  /**
+   * Eliminar un usuario por su ID.
+   * @param id ID del usuario a eliminar.
+   * @returns Observable con una respuesta de éxito.
+   */
+  deleteUser(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.usuariosUrl}/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
 }
