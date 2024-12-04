@@ -50,13 +50,13 @@ export class UserService {
   }
 
   /**
-   * Obtener un usuario por su email.
+   * Recuperar contraseña un usuario por su email.
    * @param email Email del usuario a buscar.
-   * @returns Observable con el usuario encontrado.
+   * @returns Observable con una respuesta de éxito.
    */
-  findUserByEmail(email: string): Observable<User> {
-    return this.http.get<User>(`${this.usuariosUrl}/email?email=${email}`, {
-      headers: this.getAuthHeaders()
+  recover(email: string): Observable<string> {
+    return this.http.post(`${this.usuariosUrl}/recover?email=${email}`, null, {
+      responseType: 'text'
     });
   }
 

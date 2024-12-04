@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../../services/user.service';
 import Swal from 'sweetalert2';
-import { User } from '../../../models/user.model';
 
 /**
  * @description
@@ -22,14 +21,14 @@ export class RecoveryComponent {
   recoveryForm!: FormGroup;
 
   constructor(
-    private fb: FormBuilder,
-    private userService: UserService,
-    private router: Router
+    private readonly fb: FormBuilder,
+    private readonly userService: UserService,
+    private readonly router: Router
   ) { }
 
   ngOnInit(): void {
     this.recoveryForm = this.fb.group({
-      correo: ['', [Validators.required, , Validators.email]],
+      correo: ['', [Validators.required, Validators.email]],
     });
   }
 
@@ -37,28 +36,28 @@ export class RecoveryComponent {
     if (this.recoveryForm.valid) {
       const formValue = this.recoveryForm.value;
 
-      let pista: string = "";
-      let forgottenUser: User | undefined
+      let message: string = "";
 
-      this.userService.findUserByEmail(formValue.correo).subscribe({
-        next: (data) => forgottenUser = data,
-        error: (error) => console.log(error),
-        complete: () => {
-
-          //TODO: eliminar pista
-          if (!forgottenUser) pista = "Las credenciales que ingresaste no coinciden";
-          else pista = `Tu password es "${forgottenUser?.password}"`;
-
+      this.userService.recover(formValue.correo).subscribe({
+        next: (data) => message = data,
+        error: (error) => {
+          console.log(error);
           Swal.fire({
-            icon: "success",
-            title: "Correo Enviado",
-            text: "Si tus datos son correctos, enviaremos un email con tu contraseña",
-            //TODO: eliminar pista
-            footer: `<i class="text-sm">psst!! - ${pista}</i>`,
+            icon: "error",
+            title: "Error al Recuperar",
+            text: error
           }).then(() => {
             this.router.navigate(['/']);
           });
-          
+        },
+        complete: () => {
+          Swal.fire({
+            icon: "success",
+            title: "Correo Enviado",
+            text: message
+          }).then(() => {
+            this.router.navigate(['/']);
+          });
         }
       });
     }
