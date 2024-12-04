@@ -1,9 +1,9 @@
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { UserService } from '../../services/user.service';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../services/auth.service';
 
 /**
  * @description
@@ -23,17 +23,17 @@ export class NavbarComponent {
   logoClass: string = 'bar-logo-off';
 
   constructor(
-    private userService: UserService,
-    private router: Router
+    private readonly authService: AuthService,
+    private readonly router: Router
   ) { }
 
   ngOnInit(): void {
-    this.userService.isAuthenticated.subscribe((authStatus: boolean) => { this.isAuthenticated = authStatus; });
-    this.userService.isAdminAuth.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
+    this.authService.isAuthenticated.subscribe((authStatus: boolean) => { this.isAuthenticated = authStatus; });
+    this.authService.isAdmin.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
   }
 
   salir() {
-    this.userService.logOut();
+    this.authService.logOut();
     Swal.fire({
       icon: "success",
       title: "Vuelve pronto !!",

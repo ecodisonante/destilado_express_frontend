@@ -1,12 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { UserService } from '../../../services/user.service';
-import { User } from '../../../models/user.model';
 import Swal from 'sweetalert2';
 import { CartService } from '../../../services/cart.service';
 import { Cart } from '../../../models/cart.model';
+import { AuthService } from '../../../services/auth.service';
 
 /**
  * @description
@@ -25,7 +24,7 @@ export class LoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private userService: UserService,
+    private authService: AuthService,
     private router: Router,
     private cartService: CartService
   ) { }
@@ -42,24 +41,25 @@ export class LoginComponent {
     if (this.loginForm.valid) {
 
       const login = this.loginForm.value;
-      let logingUser: User | undefined;
+      let token: string;
 
-      this.userService.findUser(login.username, login.password).subscribe({
-        next: (data) => logingUser = data,
+      this.authService.authenticate(login.username, login.password).subscribe({
+        next: (data) => token = data.token,
         error: (error) => console.log(error),
         complete: () => {
 
-          if (logingUser) {
-            this.userService.logIn(logingUser);
+          if (this.authService.isValidToken(token)) {
+            this.authService.logIn(token);
+            let nombre = this.authService.getTokenName() ?? login.username;
 
             // Crear carrito del usuario
-            if (logingUser.rol.id !== 1) {
-              this.cartService.setActiveCart(new Cart(logingUser.email, [], 0, 0));
+            if (!this.authService.checkAdmin()) {
+              this.cartService.setActiveCart(new Cart(login.username, [], 0, 0));
             }
 
             Swal.fire({
               icon: "success",
-              title: "Bienvenido, " + logingUser.nombre,
+              title: "Bienvenido, " + nombre,
             }).then(() => {
               this.router.navigate(['/']);
             });
@@ -71,7 +71,6 @@ export class LoginComponent {
               text: "Credenciales Incorrectas",
             });
           }
-
         }
       });
     }

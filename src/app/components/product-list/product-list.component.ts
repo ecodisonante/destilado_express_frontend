@@ -6,6 +6,7 @@ import { ProductService } from '../../services/product.service';
 import { UserService } from '../../services/user.service';
 import { CartService } from '../../services/cart.service';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-catalogo',
@@ -24,11 +25,12 @@ export class ProductListComponent implements OnInit {
     private readonly router: Router,
     private readonly productService: ProductService,
     private readonly userService: UserService,
+    private readonly authService: AuthService,
     private readonly cartService: CartService,
   ) { }
 
   ngOnInit(): void {
-    this.userService.isAdminAuth.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
+    this.authService.isAdmin.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
     this.loadProductList();
   }
 

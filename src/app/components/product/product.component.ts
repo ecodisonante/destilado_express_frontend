@@ -6,6 +6,7 @@ import { Product } from '../../models/product.model';
 import { UserService } from '../../services/user.service';
 import { ProductService } from '../../services/product.service';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../services/auth.service';
 
 /**
  * @description
@@ -25,13 +26,16 @@ export class ProductComponent {
     producto?: Product;
 
     constructor(
-        private fb: FormBuilder,
-        private route: ActivatedRoute,
-        private router: Router,
-        private userService: UserService,
-        private productService: ProductService
-    ) {
-        if (!this.userService.checkAdmin()) this.router.navigate(['/']);
+        private readonly fb: FormBuilder,
+        private readonly route: ActivatedRoute,
+        private readonly router: Router,
+        private readonly userService: UserService,
+        private readonly authService: AuthService,
+        private readonly productService: ProductService
+    ) { }
+
+    ngOnInit(): void {
+        if (!this.authService.checkAdmin()) this.router.navigate(['/']);
 
         this.productForm = this.fb.group({
             id: [0],
@@ -43,14 +47,12 @@ export class ProductComponent {
             oferta: [0, [Validators.required, Validators.min(0)]],
             disponible: [true],
         });
-    }
 
-    ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
             const id = params.get('id');
             if (!id || isNaN(Number(id))) this.router.navigate(['/']);
 
-            this.productService.getProduct(Number(id)).subscribe(
+            this.productService.getProductById(Number(id)).subscribe(
                 data => {
                     this.producto = data;
                     if (this.producto) {
@@ -67,19 +69,16 @@ export class ProductComponent {
             let edited = this.productForm.value;
             edited.image = this.producto!.imagen;
 
-            this.productService.updateProduct(edited).subscribe(result => {
+            this.productService.updateProduct(this.producto!.id, edited).subscribe(result => {
                 if (result) {
-
                     Swal.fire({
                         icon: "success",
                         title: "Producto actualizado",
                     }).then(() => {
                         this.router.navigate(['']);
                     });
-
                 }
             });
-
         }
     }
 

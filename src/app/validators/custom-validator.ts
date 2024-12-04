@@ -27,7 +27,7 @@ export function minAgeValidator(minAge: number): ValidatorFn {
  * @returns 
  */
 export function passwordStregthValidator() {
-    var passValidator: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+    let passValidator: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
 
     return (control: AbstractControl): ValidationErrors | null => {
         const pass: string = control.value;
