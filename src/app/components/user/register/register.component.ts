@@ -64,7 +64,7 @@ export class RegisterComponent {
    * Genera un nuevo usuario con los datos ingresados en el formulario
    * @param form formulario de registro
    */
-  private register() {
+  register() {
 
     this.registerForm.markAllAsTouched();
 
