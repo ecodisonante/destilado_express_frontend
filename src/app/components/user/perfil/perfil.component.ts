@@ -6,6 +6,7 @@ import { UserService } from '../../../services/user.service';
 import { passwordMatchValidator, passwordStregthValidator } from '../../../validators/custom-validator';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../services/auth.service';
 
 /**
  * Clase encargada de la actualizacion de perfil de usuario
@@ -30,35 +31,66 @@ export class PerfilComponent {
    * Identificador del usuario que modifica su perfil
    */
   currentUser!: User;
+  isAuthenticated!: boolean;
 
   /**
    * constructor de la clase
    */
   constructor(
-    private fb: FormBuilder,
-    private userService: UserService,
-    private router: Router
+    private readonly fb: FormBuilder,
+    private readonly userService: UserService,
+    private readonly router: Router,
+    private readonly authService: AuthService
   ) {
-    let activeUser = this.userService.getActiveUser();
-    if (activeUser) this.currentUser = activeUser;
-    else this.router.navigate(['/']);
+
   }
 
   /**
    * metodo inicial de la clase
    */
   ngOnInit(): void {
+    // Suscríbete al estado de autenticación
+    this.authService.isAuthenticated.subscribe((authStatus: boolean) => {
+      this.isAuthenticated = authStatus;
+      if (!this.isAuthenticated) {
+        this.router.navigate(['/user/login']);
+      }
+    });
 
+    // Inicializa el formulario con valores vacíos
     this.updateForm = this.fb.group({
-      nombres: [this.currentUser.nombre, Validators.required],
-      direccion: [this.currentUser.direccion, Validators.required],
-      correo: [this.currentUser.email, [Validators.required, , Validators.email]],
-      passwd: [this.currentUser.password, [Validators.required, passwordStregthValidator()]],
+      nombres: ['', Validators.required],
+      direccion: ['', Validators.required],
+      correo: ['', [Validators.required, Validators.email]],
+      passwd: ['', [Validators.required, passwordStregthValidator()]],
       repasswd: ['', Validators.required],
     }, {
       validators: passwordMatchValidator('passwd', 'repasswd')
     });
+
+    // Obtén los datos del usuario de forma asíncrona
+    const userId = this.authService.getTokenId();
+    if (userId) {
+      this.userService.getUserById(userId).subscribe({
+        next: (user) => {
+          this.currentUser = user;
+          // Actualiza el formulario con los datos del usuario
+          this.updateForm.patchValue({
+            nombres: user.nombre,
+            direccion: user.direccion,
+            correo: user.email,
+            passwd: '', // No debes cargar contraseñas reales por seguridad
+            repasswd: '',
+          });
+        },
+        error: (msg) => {
+          console.log(msg);
+          this.router.navigate(['/']);
+        },
+      });
+    }
   }
+
 
   /**
    * Actualiza la información del usuario con los datos ingresados en el formulario. 
@@ -78,9 +110,10 @@ export class PerfilComponent {
       };
 
       let result: boolean;
+      let userId = this.authService.getTokenId();
 
-      this.userService.updateUser(actualiza).subscribe({
-        next: (data) => result = data,
+      this.userService.updateUser(userId!, actualiza).subscribe({
+        next: (data) => result = data == "Usuario actualizado",
 
         error: (error) => {
           console.log(error);
