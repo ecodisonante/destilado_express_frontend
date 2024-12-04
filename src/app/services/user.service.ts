@@ -66,9 +66,7 @@ export class UserService {
    * @returns Observable con el usuario creado.
    */
   createUser(user: User): Observable<User> {
-    return this.http.post<User>(this.usuariosUrl, user, {
-      headers: this.getAuthHeaders()
-    });
+    return this.http.post<User>(this.usuariosUrl, user);
   }
 
   /**

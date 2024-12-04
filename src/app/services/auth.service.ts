@@ -45,11 +45,15 @@ export class AuthService {
         this.adminBehaviour.next(false);
     }
 
+    getToken() {
+        return this.storageService.getItem(this.tokenKey);
+    }
+
     isValidToken(providenToken: string | null = null): boolean {
         let token: string | null;
 
         if (providenToken != null) token = providenToken;
-        else token = this.storageService.getItem(this.tokenKey);
+        else token = this.getToken();
 
         // verificar que el token existe
         if (!token) return false;
@@ -79,28 +83,29 @@ export class AuthService {
         if (!this.isValidToken()) return false;
 
         // obtener datos del token
-        let token = this.storageService.getItem(this.tokenKey);
+        let token = this.getToken();
         const decodedToken = this.decodeToken(token!);
 
         // verificar rol
         const role = decodedToken?.role || 'No Role Found';
-        return role == 1;
+        console.log("Role:" + role);
+        return role === "ADMIN";
     }
 
-    getTokenId(): string | undefined {
-        let token = this.storageService.getItem(this.tokenKey);
+    getTokenId(): number | undefined {
+        let token = this.getToken();
         const decodedToken = this.decodeToken(token!);
         return decodedToken?.id || undefined;
     }
 
     getTokenName(): string | undefined {
-        let token = this.storageService.getItem(this.tokenKey);
+        let token = this.getToken();
         const decodedToken = this.decodeToken(token!);
         return decodedToken?.name || undefined;
     }
 
     getTokenEmail(): string | undefined {
-        let token = this.storageService.getItem(this.tokenKey);
+        let token = this.getToken();
         const decodedToken = this.decodeToken(token!);
         return decodedToken?.sub || undefined;
     }
