@@ -6,6 +6,7 @@ import { RegisterComponent } from './components/user/register/register.component
 import { RecoveryComponent } from './components/user/recovery/recovery.component';
 import { PerfilComponent } from './components/user/perfil/perfil.component';
 import { ProductComponent } from './components/product/product.component';
+import { VentaComponent } from './components/venta/venta.component';
 
 export const routes: Routes = [
     {
@@ -22,6 +23,11 @@ export const routes: Routes = [
         path: 'cart',
         title: 'Carrito',
         component: CartComponent,
+    },
+    {
+        path: 'ventas',
+        title: 'Ventas',
+        component: VentaComponent,
     },
     {
         path: 'user',
