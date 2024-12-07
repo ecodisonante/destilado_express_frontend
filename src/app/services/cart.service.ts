@@ -37,8 +37,10 @@ export class CartService {
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
-  getSales(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.ventasUrl);
+  getSales(): Observable<Cart[]> {
+    return this.http.get<Cart[]>(this.ventasUrl, {
+      headers: this.getAuthHeaders()
+    });
   }
 
   /**
