@@ -13,7 +13,7 @@ export class StorageService {
   /**
    * Indicador de ejecucion en entorno del cliente
    */
-  private isBrowser: boolean;
+  private readonly isBrowser: boolean;
 
   /**
    * Constructor para la clase
