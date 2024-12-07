@@ -1,3 +1,4 @@
+import { ProductDTO } from "./productDto.model";
 import { Product } from "./product.model";
 
 /**
@@ -6,7 +7,8 @@ import { Product } from "./product.model";
 export class Cart {
     id: number;
     userId: number;
-    productos: Product[];
+    productos?: ProductDTO[];
+    detalle?: Product[];
     activa: boolean;
     created: Date;
     updated: Date;
@@ -17,7 +19,8 @@ export class Cart {
     constructor(
         id: number,
         userId: number,
-        productos: Product[],
+        detalle: Product[],
+        productos: ProductDTO[],
         activa: boolean,
         created: Date,
         updated: Date,
@@ -25,6 +28,7 @@ export class Cart {
         this.id = id;
         this.userId = userId;
         this.productos = productos;
+        this.detalle = detalle;
         this.activa = activa;
         this.created = created;
         this.updated = updated;

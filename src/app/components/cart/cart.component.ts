@@ -78,7 +78,7 @@ export class CartComponent {
   private actualizaMontos() {
     this.cart.total = 0;
     this.cart.discount = 0;
-    this.cart.productos.forEach(prod => {
+    this.cart.detalle!.forEach(prod => {
       let isOferta = prod.oferta > 0 && prod.oferta < prod.precio;
       if (isOferta) {
         this.cart.total += prod.oferta;
