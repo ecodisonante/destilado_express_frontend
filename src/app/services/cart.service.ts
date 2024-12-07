@@ -1,60 +1,105 @@
-import { Injectable, inject } from '@angular/core';
-import { Cart } from '../models/cart.model';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Product } from '../models/product.model';
+import { AuthService } from './auth.service';
+import { Cart } from '../models/cart.model';
 import { StorageService } from './storage.service';
+import { ProductDTO } from '../models/productDto.model';
 
 /**
- * Clase de servicios relacionados a Carrito de Compras
+ * Clase de servicios relacionados a Producto
  */
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class CartService {
 
-    private cartKey = 'cartKey';
-    private storage = inject(StorageService);
+  // private readonly productArray = new BehaviorSubject<Product[]>([]);
+  private readonly ventasUrl = 'http://localhost:8083/api/ventas';
+  private readonly cartKey = 'CartIdKey';
 
-    getActiveCart(): Cart | null {
-        let cartList = this.storage.getItem(this.cartKey);
-        return cartList ? JSON.parse(cartList) : null;
+  constructor(
+    private readonly http: HttpClient,
+    private readonly authService: AuthService,
+    private readonly storageService: StorageService
+  ) { }
+
+  /**
+   * Construye los headers con el token de autenticación.
+   * @returns HttpHeaders con el token incluido.
+   */
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    if (!token) {
+      throw new Error('No se encontró un token válido');
     }
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  }
 
-    setActiveCart(cart: Cart) {
-        this.storage.setItem(this.cartKey, JSON.stringify(cart));
-    }
+  getSales(): Observable<Product[]> {
+    return this.http.get<Product[]>(this.ventasUrl);
+  }
 
-    clearActiveCart() {
-        this.storage.removeItem(this.cartKey);
-    }
+  /**
+   * Obtiene el carrito de compras del usuario activo.
+   * Si no tiene se creara un nuevo registro
+   */
+  getActiveCart(): Observable<Cart> {
+    return this.http.get<Cart>(`${this.ventasUrl}/activa`, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-    addToActiveCart(product: Product) {
-        let cart = this.getActiveCart();
-        if (cart) {
-            cart.items.push(product);
-            cart = this.getTotals(cart);
-            this.setActiveCart(cart);
-        }
-    }
+  getCartById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.ventasUrl}/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-    removeFromActiveCart(productId: number) {
-        let cart = this.getActiveCart();
-        if (cart) {
-            cart.items = cart.items.filter(x => x.id !== productId);
-            cart = this.getTotals(cart);
-            this.setActiveCart(cart);
-        }
-    }
+  createSale(product: Product): Observable<Product> {
+    return this.http.post<Product>(this.ventasUrl, product);
+  }
 
-    getTotals(cart: Cart): Cart {
-        cart.total = 0;
-        cart.discount = 0;
+  /**
+   * Agrega un producto al carrito de compras del usuario activo
+   */
+  addSaleProduct(product: Product): Observable<Product> {
+    let prod = new ProductDTO(product.id, 1, (product.oferta > 0 ? product.oferta : product.precio));
+    return this.http.post<Product>(`${this.ventasUrl}/${this.getStorageCartId()}/productos`, prod, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-        cart.items.forEach(prod => {
-            cart.total += prod.oferta != 0 ? prod.oferta : prod.precio;
-            cart.discount += prod.oferta != 0 ? (prod.precio - prod.oferta) : 0;
-        });
+  updateSaleProduct(id: number, product: Product): Observable<string> {
+    return this.http.put<string>(`${this.ventasUrl}/${id}`, product, {
+      headers: this.getAuthHeaders(),
+      responseType: 'text' as 'json'
+    });
+  }
 
-        return cart;
-    }
+  /**
+   * Elimina un producto del carrito de compras del usuario activo
+   */
+  deleteSaleProduct(cartId: number, productId: number): Observable<void> {
+    return this.http.delete<void>(`${this.ventasUrl}/${cartId}/productos/${productId}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  /**
+   * Obtiene el Id del carrito de compras del usuario activo
+   */
+  getStorageCartId(): number | null {
+    let cartId = this.storageService.getItem(this.cartKey);
+    return cartId ? JSON.parse(cartId) : null;
+  }
+
+  /**
+   * Almacena el Id del carrito de compras del usuario activo
+   */
+  setStorageCartId(cartId: number) {
+    this.storageService.setItem(this.cartKey, JSON.stringify(cartId));
+  }
 
 }
