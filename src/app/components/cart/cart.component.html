@@ -4,7 +4,7 @@
 
         <h3>Mi carrito</h3>
 
-        @if (cart) {
+        @if (cart && cart.detalle!.length > 0) {
 
         <table class="table table-borderless align-middle" id="chart-table">
             <tr *ngFor="let prod of cart?.detalle; let i = index">

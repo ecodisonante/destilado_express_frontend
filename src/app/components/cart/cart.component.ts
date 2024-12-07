@@ -44,7 +44,10 @@ export class CartComponent {
   getActiveCart() {
     this.cartService.getActiveCart().subscribe({
       next: cart => this.cart = cart,
-      complete: () => this.actualizaMontos()
+      complete: () => {
+        this.cartService.setStorageCartId(this.cart.id);
+        this.actualizaMontos();
+      }
     });
   }
 
@@ -62,17 +65,29 @@ export class CartComponent {
   }
 
   pagar() {
-    //TODO
-    Swal.fire({
-      icon: "success",
-      title: "Tu compra se ha realizado.",
-      text: "Recibirás un correo de confirmación indicando la fecha en que tu compra será despachada.",
-      footer: "(mentira XD)"
-    }).then(() => {
-      this.clearChart();
-      this.router.navigate(['/']);
-    });
+    this.cartService.unactivateSale(this.cart.id).subscribe({
+      error: () => {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Tu compra no se ha podido completar.Intenta de nuevo o elige más productos ;)",
+        });
+      },
+      complete: () => {
 
+        this.cartService.getActiveCart().subscribe((cart) => { this.cartService.setStorageCartId(cart.id) });
+
+        Swal.fire({
+          icon: "success",
+          title: "Tu compra se ha realizado.",
+          text: "Recibirás un correo de confirmación indicando la fecha en que tu compra será despachada.",
+          footer: "(mentira XD)"
+        }).then(() => {
+          this.clearChart();
+          this.router.navigate(['/']);
+        });
+      }
+    });
   }
 
   private actualizaMontos() {

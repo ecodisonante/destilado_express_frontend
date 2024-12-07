@@ -80,6 +80,12 @@ export class CartService {
     });
   }
 
+  unactivateSale(id:number) {
+    return this.http.put<Cart>(`${this.ventasUrl}/${id}`, {}, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   /**
    * Elimina un producto del carrito de compras del usuario activo
    */
@@ -100,8 +106,7 @@ export class CartService {
   /**
    * Almacena el Id del carrito de compras del usuario activo
    */
-  setStorageCartId(cartId: number) {
+  setStorageCartId(cartId: number | null) {
     this.storageService.setItem(this.cartKey, JSON.stringify(cartId));
   }
-
 }
