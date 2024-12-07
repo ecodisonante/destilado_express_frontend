@@ -3,9 +3,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import Swal from 'sweetalert2';
-import { CartService } from '../../../services/cart.service';
-import { Cart } from '../../../models/cart.model';
 import { AuthService } from '../../../services/auth.service';
+import { CartService } from '../../../services/cart.service';
 
 /**
  * @description
@@ -23,10 +22,10 @@ export class LoginComponent {
   loginForm!: FormGroup;
 
   constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private cartService: CartService
+    private readonly fb: FormBuilder,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly cartService: CartService
   ) { }
 
 
@@ -54,7 +53,9 @@ export class LoginComponent {
 
             // Crear carrito del usuario
             if (!this.authService.checkAdmin()) {
-              this.cartService.setActiveCart(new Cart(login.username, [], 0, 0));
+              this.cartService.getActiveCart().subscribe({
+                next: cart => this.cartService.setStorageCartId(cart.id)
+              });
             }
 
             Swal.fire({

@@ -1,0 +1,36 @@
+<section id="sales" class="d-inline">
+    <div class="container">
+        <h3>Registro de ventas</h3>
+
+        @if(sales && sales.length > 0){
+
+        <table class="table table-borderless align-middle mt-5" id="sales-table">
+            <tr>
+                <th>Fecha</th>
+                <th>Nro. Venta</th>
+                <th>Cant. productos</th>
+                <th>Total</th>
+                <th></th>
+            </tr>
+
+            <tr *ngFor="let sale of sales; let i = index">
+                <td>{{sale.updated | date: 'dd-MM-yyyy'}}</td>
+                <td>{{sale.id}}</td>
+                <td>{{sale.productos?.length}}</td>
+                <td>{{sale.total | currency:'CLP':'$'}}</td>
+                <td><a href="/" class="btn btn-info bg-info px-3">Detalle</a></td>
+            </tr>
+
+            <tr class="pt-5">
+                <th colspan="3" class="text-end p-5"> <strong> TOTAL VENTAS </strong></th>
+                <th><strong>{{totalVentas | currency:'CLP':'$'}}</strong></th>
+            </tr>
+        </table>
+
+    }
+    @else {
+        <div class="mt-5">Aun no hay ventas registradas</div>
+    }
+    </div>
+
+</section>

@@ -4,9 +4,9 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../services/product.service';
 import { UserService } from '../../services/user.service';
-import { CartService } from '../../services/cart.service';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-catalogo',
@@ -44,21 +44,44 @@ export class ProductListComponent implements OnInit {
 
   addToCart(id: number) {
     let prod = this.catalogo.find(x => x.id === id);
-    this.cartService.addToActiveCart(prod!);
+    this.cartService.addSaleProduct(prod!).subscribe({
+      next: data => console.log(data),
+      error: () => {
+        Swal.fire({
+          icon: "error",
+          title: "Producto NO Agregado",
+          text: "Ocurrio un error al agrtegar tu producto al carrito.",
+          showCancelButton: true,
+          confirmButtonText: "Ver mi carrito",
+          cancelButtonText: "Seguir comprando"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.router.navigate(['/cart']);
+          } else {
+            return;
+          }
+        });
+      },
+      complete: () => {
 
-    Swal.fire({
-      icon: "success",
-      title: "Producto Agregado",
-      showCancelButton: true,
-      confirmButtonText: "Ver mi carrito",
-      cancelButtonText: "Seguir comprando"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.router.navigate(['/cart']);
-      } else {
-        return;
+        Swal.fire({
+          icon: "success",
+          title: "Producto Agregado",
+          showCancelButton: true,
+          confirmButtonText: "Ver mi carrito",
+          cancelButtonText: "Seguir comprando"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.router.navigate(['/cart']);
+          } else {
+            return;
+          }
+        });
+
       }
+
     });
+
   }
 
 }

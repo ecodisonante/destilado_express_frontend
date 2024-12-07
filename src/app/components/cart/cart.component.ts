@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { Cart } from '../../models/cart.model';
-import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
+import { Cart } from '../../models/cart.model';
 
 /**
  * @description
@@ -28,7 +27,6 @@ export class CartComponent {
 
   constructor(
     private readonly router: Router,
-    private readonly userService: UserService,
     private readonly cartService: CartService,
     private readonly authService: AuthService
   ) { }
@@ -40,24 +38,27 @@ export class CartComponent {
     if (!this.isAuthenticated) this.router.navigate(['/user/login']);
     if (this.isAdmin) this.router.navigate(['/']);
 
-    this.email = this.authService.getTokenEmail();
     this.getActiveCart();
   }
 
   getActiveCart() {
-    if (this.email) {
-      this.cart = this.cartService.getActiveCart() ?? new Cart(this.email, [], 0, 0);
-    }
+    this.cartService.getActiveCart().subscribe({
+      next: cart => this.cart = cart,
+      complete: () => this.actualizaMontos()
+    });
   }
 
   removeFromChart(id: number) {
-    this.cartService.removeFromActiveCart(id);
-    this.getActiveCart();
+    this.cartService.deleteSaleProduct(this.cart.id, id).subscribe({
+      next: () => this.getActiveCart(),
+      complete: () => this.actualizaMontos()
+    });
   }
 
   clearChart() {
-    this.cart = new Cart(this.email!, [], 0, 0);
-    this.cartService.setActiveCart(this.cart);
+    //TODO
+    // this.cart = new OldCart(this.email!, [], 0, 0);
+    // this.cartService.setActiveCart(this.cart);
   }
 
   pagar() {
@@ -72,5 +73,19 @@ export class CartComponent {
       this.router.navigate(['/']);
     });
 
+  }
+
+  private actualizaMontos() {
+    this.cart.total = 0;
+    this.cart.discount = 0;
+    this.cart.detalle!.forEach(prod => {
+      let isOferta = prod.oferta > 0 && prod.oferta < prod.precio;
+      if (isOferta) {
+        this.cart.total += prod.oferta;
+        this.cart.discount += prod.precio - prod.oferta;
+      } else {
+        this.cart.total += prod.precio;
+      }
+    });
   }
 }

@@ -7,7 +7,7 @@
         @if (cart) {
 
         <table class="table table-borderless align-middle" id="chart-table">
-            <tr *ngFor="let prod of cart?.items; let i = index">
+            <tr *ngFor="let prod of cart?.detalle; let i = index">
                 <td>{{ i + 1 }}</td>
                 <td>
                     <table class="table table-borderless align-middle">

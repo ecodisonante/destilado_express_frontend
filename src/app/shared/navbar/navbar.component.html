@@ -12,9 +12,13 @@
                     <a class="nav-link" [routerLink]="['/catalogo']" id="home">
                         <i class="bi bi-house mx-2"></i>Inicio</a>
                 </li>
-                <li *ngIf="isAuthenticated && ! isAdmin" class="nav-item mx-2">
+                <li *ngIf="isAuthenticated && !isAdmin" class="nav-item mx-2">
                     <a class="nav-link" [routerLink]="['/cart']">
                         <i class="bi bi-cart-dash mx-2"></i>Mi Carrito</a>
+                </li>
+                <li *ngIf="isAuthenticated && isAdmin" class="nav-item mx-2">
+                    <a class="nav-link" [routerLink]="['/ventas']">
+                        <i class="bi bi-coin mx-2"></i>Ventas</a>
                 </li>
                 <li *ngIf="!isAuthenticated" class="nav-item mx-2">
                     <a class="nav-link" [routerLink]="['/user/login']">
