@@ -3,7 +3,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Product } from '../../models/product.model';
-import { UserService } from '../../services/user.service';
 import { ProductService } from '../../services/product.service';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth.service';
@@ -29,7 +28,6 @@ export class ProductComponent {
         private readonly fb: FormBuilder,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly userService: UserService,
         private readonly authService: AuthService,
         private readonly productService: ProductService
     ) { }
