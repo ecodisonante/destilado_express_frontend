@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { UserService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
 import { Cart } from '../../models/cart.model';
@@ -19,15 +18,16 @@ export class VentaComponent {
   totalVentas: number = 0;
 
   constructor(
-    private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly cartService: CartService
   ) { }
 
   ngOnInit(): void {
-    if (!this.authService.checkAdmin()) this.router.navigate(['/']);
+    if (!this.authService.checkAdmin()){
+      this.router.navigate(['/']);
+      return;
+    } 
 
     this.getAllSales();
   }
