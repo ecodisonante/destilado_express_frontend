@@ -67,7 +67,12 @@ export class CartService {
    * Agrega un producto al carrito de compras del usuario activo
    */
   addSaleProduct(product: Product): Observable<Product> {
-    let prod = new ProductDTO(product.id, 1, (product.oferta > 0 ? product.oferta : product.precio));
+    let prod: ProductDTO = {
+      idProducto: product.id, 
+      cantidad: 1,
+      precioUnidad: (product.oferta > 0 ? product.oferta : product.precio)
+    };
+    
     return this.http.post<Product>(`${this.ventasUrl}/${this.getStorageCartId()}/productos`, prod, {
       headers: this.getAuthHeaders()
     });
