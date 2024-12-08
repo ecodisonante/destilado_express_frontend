@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Product } from '../../models/product.model';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../services/product.service';
-import { UserService } from '../../services/user.service';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
@@ -19,18 +18,18 @@ export class ProductListComponent implements OnInit {
 
   catalogo: Product[] = [];
   isAdmin!: boolean;
+  isAuthenticated!: boolean;
 
   constructor(
-    private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly productService: ProductService,
-    private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly cartService: CartService,
   ) { }
 
   ngOnInit(): void {
     this.authService.isAdmin.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
+    this.authService.isAuthenticated.subscribe((authStatus: boolean) => { this.isAuthenticated = authStatus; });
     this.loadProductList();
   }
 
@@ -43,44 +42,59 @@ export class ProductListComponent implements OnInit {
 
 
   addToCart(id: number) {
-    let prod = this.catalogo.find(x => x.id === id);
-    this.cartService.addSaleProduct(prod!).subscribe({
-      next: data => console.log(data),
-      error: () => {
-        Swal.fire({
-          icon: "error",
-          title: "Producto NO Agregado",
-          text: "Ocurrio un error al agrtegar tu producto al carrito.",
-          showCancelButton: true,
-          confirmButtonText: "Ver mi carrito",
-          cancelButtonText: "Seguir comprando"
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.router.navigate(['/cart']);
-          } else {
-            return;
-          }
-        });
-      },
-      complete: () => {
+    if (!this.isAuthenticated) {
 
-        Swal.fire({
-          icon: "success",
-          title: "Producto Agregado",
-          showCancelButton: true,
-          confirmButtonText: "Ver mi carrito",
-          cancelButtonText: "Seguir comprando"
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.router.navigate(['/cart']);
-          } else {
-            return;
-          }
-        });
+      Swal.fire({
+        icon: "info",
+        title: "Ingreso de Usuario",
+        text: "Debes registrarte o iniciar sesion para comprar",
+        confirmButtonText: "Ir al login",
+      }).then(() => {
+        this.router.navigate(['/user/login']);
+      });
 
-      }
+    } else {
 
-    });
+
+      let prod = this.catalogo.find(x => x.id === id);
+      this.cartService.addSaleProduct(prod!).subscribe({
+        next: data => console.log(data),
+        error: () => {
+          Swal.fire({
+            icon: "error",
+            title: "Producto NO Agregado",
+            text: "Ocurrio un error al agrtegar tu producto al carrito.",
+            showCancelButton: true,
+            confirmButtonText: "Ver mi carrito",
+            cancelButtonText: "Seguir comprando"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.router.navigate(['/cart']);
+            } else {
+              return;
+            }
+          });
+        },
+        complete: () => {
+
+          Swal.fire({
+            icon: "success",
+            title: "Producto Agregado",
+            showCancelButton: true,
+            confirmButtonText: "Ver mi carrito",
+            cancelButtonText: "Seguir comprando"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.router.navigate(['/cart']);
+            } else {
+              return;
+            }
+          });
+
+        }
+
+      });
+    }
 
   }
 
