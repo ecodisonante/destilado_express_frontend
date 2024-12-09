@@ -53,14 +53,14 @@ export class CartService {
     });
   }
 
-  getCartById(id: number): Observable<Product> {
-    return this.http.get<Product>(`${this.ventasUrl}/${id}`, {
+  getCartById(id: number): Observable<Cart> {
+    return this.http.get<Cart>(`${this.ventasUrl}/${id}`, {
       headers: this.getAuthHeaders()
     });
   }
 
-  createSale(product: Product): Observable<Product> {
-    return this.http.post<Product>(this.ventasUrl, product);
+  createSale(product: Cart): Observable<Cart> {
+    return this.http.post<Cart>(this.ventasUrl, product);
   }
 
   /**
