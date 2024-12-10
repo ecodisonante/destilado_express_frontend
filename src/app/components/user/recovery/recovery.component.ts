@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './recovery.component.html',
-  styleUrl: './recovery.component.css'
+  styleUrls: ['./recovery.component.css']
 })
 export class RecoveryComponent {
 

@@ -1,119 +1,128 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
-// import { ReactiveFormsModule } from '@angular/forms';
-// import { of, throwError } from 'rxjs';
-// import { ActivatedRoute, Router } from '@angular/router';
-// import { LoginComponent } from './login.component';
-// import { UserService } from '../../../services/user.service';
-// import { CartService } from '../../../services/cart.service';
-// import Swal from 'sweetalert2';
-// import { User } from '../../../models/user.model';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { of, throwError } from 'rxjs';
+import Swal from 'sweetalert2';
 
-// describe('LoginComponent', () => {
-//   let component: LoginComponent;
-//   let fixture: ComponentFixture<LoginComponent>;
-//   let userService: jasmine.SpyObj<UserService>;
-//   let cartService: jasmine.SpyObj<CartService>;
-//   let router: jasmine.SpyObj<Router>;
-//   let activatedRoute: ActivatedRoute;
+import { LoginComponent } from './login.component';
+import { AuthService } from '../../../services/auth.service';
+import { CartService } from '../../../services/cart.service';
+import { provideRouter, Router } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { Cart } from '../../../models/cart.model';
 
-//   beforeEach(async () => {
-//     const userServiceSpy = jasmine.createSpyObj('UserService', ['findUser', 'logIn']);
-//     const cartServiceSpy = jasmine.createSpyObj('CartService', ['setActiveCart']);
-//     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-//     const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', ['']);
+describe('LoginComponent', () => {
+    let component: LoginComponent;
+    let fixture: ComponentFixture<LoginComponent>;
+    let mockAuthService: jasmine.SpyObj<AuthService>;
+    let mockCartService: jasmine.SpyObj<CartService>;
+    let routerSpy: jasmine.SpyObj<Router>;
 
-//     await TestBed.configureTestingModule({
-//       imports: [ReactiveFormsModule, LoginComponent],
-//       providers: [
-//         { provide: UserService, useValue: userServiceSpy },
-//         { provide: CartService, useValue: cartServiceSpy },
-//         { provide: Router, useValue: routerSpy },
-//         { provide: ActivatedRoute, useValue: activatedRouteSpy }
-//       ]
-//     }).compileComponents();
+    const fakeCart: Cart = {
+        id: 123,
+        detalle: [
+          { productoId: 1, precio: 100, oferta: 0 },
+          { productoId: 2, precio: 200, oferta: 50 }, // oferta menor al precio, debe contar el descuento
+        ]
+      } as unknown as Cart;
 
-//     fixture = TestBed.createComponent(LoginComponent);
-//     component = fixture.componentInstance;
-//     userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
-//     cartService = TestBed.inject(CartService) as jasmine.SpyObj<CartService>;
-//     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    beforeEach(async () => {
+        mockAuthService = jasmine.createSpyObj('AuthService', ['authenticate', 'isValidToken', 'logIn', 'getTokenName', 'checkAdmin']);
+        mockCartService = jasmine.createSpyObj('CartService', ['getActiveCart', 'setStorageCartId']);
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
-//     userService.findUser.and.returnValue(of(undefined));
+        await TestBed.configureTestingModule({
+            imports: [LoginComponent, ReactiveFormsModule],
+            declarations: [],
+            providers: [
+                provideRouter([]),
+                provideHttpClient(),
+                provideHttpClientTesting(),
+                FormBuilder,
+                { provide: AuthService, useValue: mockAuthService },
+                { provide: CartService, useValue: mockCartService }
+            ]
+        }).compileComponents();
+    });
 
-//     fixture.detectChanges();
-//   });
 
-//   it('should create the component', () => {
-//     expect(component).toBeTruthy();
-//   });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(LoginComponent);
+        component = fixture.componentInstance;
 
-//   it('should initialize the login form', () => {
-//     expect(component.loginForm).toBeTruthy();
-//     expect(component.loginForm.controls['username']).toBeTruthy();
-//     expect(component.loginForm.controls['password']).toBeTruthy();
-//   });
+        mockCartService.getActiveCart.and.returnValue(of(fakeCart));
+    });
 
-//   it('should not call login if form is invalid', () => {
-//     spyOn(component, 'login').and.callThrough();
 
-//     component.loginForm.controls['username'].setValue('');
-//     component.loginForm.controls['password'].setValue('');
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 
-//     component.login();
+    it('should initialize login form on init', () => {
+        fixture.detectChanges();
 
-//     expect(component.login).toHaveBeenCalled();
-//     expect(userService.findUser).not.toHaveBeenCalled();
-//   });
+        expect(component.loginForm).toBeDefined();
+        expect(component.loginForm.controls['username']).toBeTruthy();
+        expect(component.loginForm.controls['password']).toBeTruthy();
+    });
 
-//   // it('should call login and handle successful login', () => {
-//   //   spyOn(Swal, 'fire').and.returnValue(Promise.resolve({ isConfirmed: true }));
+    it('should handle login successfully', () => {
+        const formBuilder: FormBuilder = TestBed.inject(FormBuilder);
+        component.loginForm = formBuilder.group({
+            username: ['testuser'],
+            password: ['Password123!']
+        });
 
-//   //   const mockUser = { username: 'test', password: 'test', isAdmin: false, nombre: 'Test User' } as User;
-//   //   userService.findUser.and.returnValue(of(mockUser));
+        const mockToken = 'mock-jwt-token';
+        mockAuthService.authenticate.and.returnValue(of({ token: mockToken }));
+        mockAuthService.isValidToken.and.returnValue(true);
+        mockAuthService.getTokenName.and.returnValue('testuser');
 
-//   //   component.loginForm.controls['username'].setValue('test');
-//   //   component.loginForm.controls['password'].setValue('test');
+        const swalSpy = spyOn(Swal, 'fire').and.returnValue(Promise.resolve({ isConfirmed: true } as any));
 
-//   //   component.login();
+        component.login();
 
-//   //   expect(userService.findUser).toHaveBeenCalledWith('test', 'test');
-//   //   expect(userService.logIn).toHaveBeenCalledWith(mockUser);
-//   //   expect(cartService.setActiveCart).toHaveBeenCalled();
-//   //   expect(Swal.fire).toHaveBeenCalledWith({
-//   //     icon: "success",
-//   //     title: "Bienvenido, Test User",
-//   //   });
-//   //   expect(router.navigate).toHaveBeenCalledWith(['/']);
-//   // });
+        expect(mockAuthService.authenticate).toHaveBeenCalled();
+        expect(mockAuthService.isValidToken).toHaveBeenCalledWith(mockToken);
+        expect(mockAuthService.logIn).toHaveBeenCalledWith(mockToken);
+    });
 
-//   // it('should handle login with invalid credentials', () => {
-//   //   spyOn(Swal, 'fire').and.returnValue(Promise.resolve({ isConfirmed: true }));
+    it('should handle login failure due to invalid credentials', () => {
+        const formBuilder: FormBuilder = TestBed.inject(FormBuilder);
+        component.loginForm = formBuilder.group({
+            username: ['testuser'],
+            password: ['Password123!']
+        });
 
-//   //   userService.findUser.and.returnValue(of(undefined));
+        const mockToken = 'mock-jwt-token';
+        mockAuthService.authenticate.and.returnValue(of({ token: mockToken }));
+        mockAuthService.isValidToken.and.returnValue(false);
 
-//   //   component.loginForm.controls['username'].setValue('wrong');
-//   //   component.loginForm.controls['password'].setValue('wrong');
+        const swalSpy = spyOn(Swal, 'fire').and.returnValue(Promise.resolve({} as any));
 
-//   //   component.login();
+        component.login();
 
-//   //   expect(userService.findUser).toHaveBeenCalledWith('wrong', 'wrong');
-//   //   expect(Swal.fire).toHaveBeenCalledWith({
-//   //     icon: "error",
-//   //     title: "Error",
-//   //     text: "Credenciales Incorrectas",
-//   //   });
-//   // });
+        expect(mockAuthService.authenticate).toHaveBeenCalled();
+        expect(mockAuthService.isValidToken).toHaveBeenCalledWith(mockToken);
+        expect(swalSpy).toHaveBeenCalledWith(jasmine.objectContaining({
+            icon: "error",
+            title: "Error",
+            text: "Credenciales Incorrectas",
+        }));
+    });
 
-//   it('should handle login error', () => {
-//     userService.findUser.and.returnValue(throwError('error'));
+    it('should handle login error', () => {
+        const formBuilder: FormBuilder = TestBed.inject(FormBuilder);
+        component.loginForm = formBuilder.group({
+            username: ['testuser'],
+            password: ['Password123!']
+        });
 
-//     spyOn(console, 'log');
+        mockAuthService.authenticate.and.returnValue(throwError('Login Error'));
+        spyOn(Swal, 'fire').and.returnValue(Promise.resolve({} as any));
 
-//     component.loginForm.controls['username'].setValue('test');
-//     component.loginForm.controls['password'].setValue('test');
+        component.login();
 
-//     component.login();
-
-//     expect(console.log).toHaveBeenCalledWith('error');
-//   });
-// });
+        expect(mockAuthService.authenticate).toHaveBeenCalled();
+    });
+});

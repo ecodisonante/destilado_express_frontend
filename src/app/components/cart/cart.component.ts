@@ -15,7 +15,7 @@ import { Cart } from '../../models/cart.model';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './cart.component.html',
-  styleUrl: './cart.component.css'
+  styleUrls: ['./cart.component.css']
 })
 export class CartComponent {
 
@@ -35,8 +35,15 @@ export class CartComponent {
     this.authService.isAuthenticated.subscribe((authStatus: boolean) => { this.isAuthenticated = authStatus; });
     this.authService.isAdmin.subscribe((adminStatus: boolean) => { this.isAdmin = adminStatus; });
 
-    if (!this.isAuthenticated) this.router.navigate(['/user/login']);
-    if (this.isAdmin) this.router.navigate(['/']);
+    if (!this.isAuthenticated) {
+      this.router.navigate(['/user/login']);
+      return;
+    }
+    if (this.isAdmin) {
+      this.router.navigate(['/']);
+      return;
+    }
+
 
     this.getActiveCart();
   }
