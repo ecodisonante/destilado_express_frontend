@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../models/product.model';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 /**
  * Clase de servicios relacionados a Producto
@@ -13,7 +14,7 @@ import { AuthService } from './auth.service';
 export class ProductService {
 
   // private readonly productArray = new BehaviorSubject<Product[]>([]);
-  private readonly productosUrl = 'http://localhost:8081/api/productos';
+  private readonly productosUrl = `${environment.apiUrl}:8081/api/productos`;
 
   constructor(
     private readonly http: HttpClient,

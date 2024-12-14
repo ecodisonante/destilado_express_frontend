@@ -3,6 +3,7 @@ import { StorageService } from './storage.service';
 import { jwtDecode } from "jwt-decode";
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 /**
  * Clase de servicios relacionados a Usuarios
@@ -13,7 +14,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class AuthService {
 
     private readonly tokenKey = 'userToken';
-    private readonly authUrl = 'http://localhost:8080/api/auth/login';
+    private readonly authUrl = `${environment.apiUrl}:8080/api/auth/login`;
 
     private readonly loggedInBehaviour = new BehaviorSubject<boolean>(this.isValidToken());
     private readonly adminBehaviour = new BehaviorSubject<boolean>(this.checkAdmin());
