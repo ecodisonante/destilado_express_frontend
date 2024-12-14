@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { Cart } from '../models/cart.model';
 import { StorageService } from './storage.service';
 import { ProductDTO } from '../models/productDto.model';
+import { environment } from '../../environments/environment';
 
 /**
  * Clase de servicios relacionados a Producto
@@ -16,7 +17,8 @@ import { ProductDTO } from '../models/productDto.model';
 export class CartService {
 
   // private readonly productArray = new BehaviorSubject<Product[]>([]);
-  private readonly ventasUrl = 'http://localhost:8083/api/ventas';
+  private readonly ventasUrl = `${environment.apiUrl}:8083/api/ventas`;
+
   private readonly cartKey = 'CartIdKey';
 
   constructor(
@@ -68,11 +70,11 @@ export class CartService {
    */
   addSaleProduct(product: Product): Observable<Product> {
     let prod: ProductDTO = {
-      idProducto: product.id, 
+      idProducto: product.id,
       cantidad: 1,
       precioUnidad: (product.oferta > 0 ? product.oferta : product.precio)
     };
-    
+
     return this.http.post<Product>(`${this.ventasUrl}/${this.getStorageCartId()}/productos`, prod, {
       headers: this.getAuthHeaders()
     });
@@ -85,7 +87,7 @@ export class CartService {
     });
   }
 
-  unactivateSale(id:number) {
+  unactivateSale(id: number) {
     return this.http.put<Cart>(`${this.ventasUrl}/${id}`, {}, {
       headers: this.getAuthHeaders()
     });
